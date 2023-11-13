@@ -1,5 +1,7 @@
 # Proceso y Respuestas
 
+![13](https://github.com/miguelvega/PC3_CC3S2/assets/124398378/26c72df9-f630-4464-bc39-bbd24ddc1bb4)
+
 ### Pregunta: ¿Cómo decide Rails dónde y cómo crear la base de datos de desarrollo? (Sugerencia: verifica los subdirectorios db y config)
 
 Rails utiliza la configuración definida en el archivo config/database.yml para determinar dónde y cómo crear la base de datos de desarrollo. 
@@ -48,6 +50,9 @@ end
 El código nos muestra una representación en Ruby de la estructura de la tabla "movies" en la base de datos, tal como fue creada por la migración anterior.
 
 
+Ahora insertamos los "datos semilla" en la base de datos. (Las semillas son elementos de datos iniciales que la aplicación necesita para ejecutarse):
+
+![14](https://github.com/miguelvega/PC3_CC3S2/assets/124398378/8768da08-b330-4f70-891a-b851fd88ef09)
 
 ### Pregunta: ¿Qué datos de semilla se insertaron y dónde se especificaron? (Pista: rake -T db:seed explica la tarea de semilla, rake -T explica otras tareas de Rake disponibles)
 El archivo `db/seeds.rb` contiene un conjunto de datos de semilla que se cargarán en la base de datos cuando ejecutamos `bundle exec rake db:seed`.
@@ -59,6 +64,16 @@ En este caso, se están creando varias películas con sus títulos, clasificacio
 El código Ruby en el archivo db/seeds.rb utiliza el método create! para crear registros en la base de datos basados en el array movies y cuando
 ejecutamos `bundle exec rake db:seed`, se ejecuta este código y se insertan las películas en la base de datos.
 
+
+Luego, para ejecutar y obtener una vista previa de nuestra aplicación Rails localmente, ejecutamos el comando `bin/rails server`, esto iniciará el servidor de desarrollo WEBrick y la aplicación estará disponible en http://localhost:3000 por defecto.
+
+![17](https://github.com/miguelvega/PC3_CC3S2/assets/124398378/cb05b08d-19c4-4984-89e6-d204cc0b8e1e)
+
+
+Agregamos los calaboradores en nuestro repositorio de GitHUb que van a participar en este proyecto.
+![19](https://github.com/miguelvega/PC3_CC3S2/assets/124398378/41a062ca-6b99-46f2-a0d2-eff28d60cfd6)
+
+Y le asignamos las ramas con la cual van a trabajar
 
 
 
