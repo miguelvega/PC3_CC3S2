@@ -70,10 +70,13 @@ Luego, para ejecutar y obtener una vista previa de nuestra aplicación Rails loc
 ![17](https://github.com/miguelvega/PC3_CC3S2/assets/124398378/cb05b08d-19c4-4984-89e6-d204cc0b8e1e)
 
 
-Agregamos los calaboradores en nuestro repositorio de GitHUb que van a participar en este proyecto.
+Agregamos a los colaboradores en nuestro repositorio de GitHub que participarán en este proyecto.
+
 ![19](https://github.com/miguelvega/PC3_CC3S2/assets/124398378/41a062ca-6b99-46f2-a0d2-eff28d60cfd6)
 
 Y le asignamos las ramas con la cual van a trabajar
 
-
+<p align="center">
+  <img src="https://github.com/miguelvega/PC3_CC3S2/assets/124398378/ff1505a4-b124-4a2f-9ef1-760266126edf" alt="Descripción de la imagen">
+</p>
 
