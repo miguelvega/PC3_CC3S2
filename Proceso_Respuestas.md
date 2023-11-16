@@ -119,3 +119,4 @@ origin  https://github.com/miguelvega/PC3_CC3S2 (push)
 
 Cambiamos el stack de Heroku a 20, con el comando `heroku stack:set heroku-20`
 
+Al abrir la aplicación de heroku con URL : https://su23-chips53-4-c3a1ca3c6fe7.herokuapp.com/ aparece **Application Error** ya que la tabla movies no existe al no realizarse anteriormete la migración al igual como lo hicimos localmente. Para ello ejecutamos `heroku run rake db:migrate` para crear la tabla y `heroku run rake db:seed` para llenar algunos registros.
