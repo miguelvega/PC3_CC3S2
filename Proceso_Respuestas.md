@@ -120,3 +120,17 @@ origin  https://github.com/miguelvega/PC3_CC3S2 (push)
 Cambiamos el stack de Heroku a 20, con el comando `heroku stack:set heroku-20`
 
 Al abrir la aplicación de heroku con URL : https://su23-chips53-4-c3a1ca3c6fe7.herokuapp.com/ aparece **Application Error** ya que la tabla movies no existe al no realizarse anteriormete la migración al igual como lo hicimos localmente. Para ello ejecutamos `heroku run rake db:migrate` para crear la tabla y `heroku run rake db:seed` para llenar algunos registros.
+
+Antes de esto debemos hacer algunos cambios, ya que al momento de desplegarlo en Heroku, la base de datos no será SQLite como en desarrollo o en test. Por lo que debemos de realizar algunos cambios en `database.yml` 
+
+```yml
+production:
+  <<: *default
+  adapter: postgresql
+  enconding: unicode 
+  pool: 5
+  database: db/production.sqlite3
+```
+
+Y además no hemos agregado PostgresSQL en nuestra app de Heroku, por lo que usamos el siguiente comando, primero verificamos la no existencia de este con `heroku addons` y debe retornar algo como `No add-ons for app su23-chips53-4.`. Luego `heroku addons:create heroku-postgresql` para crear una base de datos postgresql en Heroku para en esta realizar las migraciones e insertar las semillas.
+
