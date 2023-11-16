@@ -135,3 +135,43 @@ production:
 Y además no hemos agregado PostgresSQL en nuestra app de Heroku, por lo que usamos el siguiente comando, primero verificamos la no existencia de este con `heroku addons` y debe retornar algo como `No add-ons for app su23-chips53-4.`. Luego `heroku addons:create heroku-postgresql` para crear una base de datos postgresql en Heroku para en esta realizar las migraciones e insertar las semillas.
 
 Para acceder a la aplicación https://su23-chips53-4-c3a1ca3c6fe7.herokuapp.com/
+
+## Parte 1 : Filtrar la lista de películas por clasificación
+
+Para esto primero necesitamos agregar en la vista index.html.erb un formulario
+
+```ruby
+<%= form_tag movies_path, method: :get, id: 'ratings_form' do %>
+  <% @all_ratings.each do |rating| %>
+    <div class="form-check form-check-inline">
+      <%= label_tag "ratings[#{rating}]", rating, class: 'form-check-label' %>
+      <%= check_box_tag "ratings[#{rating}]", "1", @ratings_to_show.include?(rating), class: 'form-check-input' %>
+    </div>
+  <% end %>
+  <%= submit_tag 'Refresh', id: 'rating_submit', class: 'btn btn-primary' %>  
+<% end %>
+```
+
+Sin embargo al desplegarlo localmente se encuentran fallos, uno de ellos era la variable `@all_ratings` no es una colección para hacerle un `each`. Para solucionar esto en el modelo `movie.rb` debemos de agregarle un método de clase para obtener este arreglo
+
+```ruby
+def self.all_ratings
+  ['G','PG','PG-13','R']
+end
+```
+
+Y luego en el controlador crear la variable `@all_ratings` que se usará en la vista.
+
+```ruby
+@all_ratings = Movie.all_ratings
+```
+
+Al volverlo a desplegar, encontramos otro error en la variable `@ratings_to_show` podriamos definirla estas debe de contener los ratings seleccionados, sin embargo al usar el método `include?` no se puede hacer a una variable `nil`, por lo que debe tener un valor por defecto no nulo.
+
+```ruby
+@ratings_to_show = params[:ratings] || @all_ratings
+```
+
+- **Pregunta:** ¿Por qué el controlador debe configurar un valor predeterminado para @ratings_to_show incluso si no se marca nada? 
+
+Porque como se dijo anteriormete, en la vista se usa un método `include` a esa variable y al cargar la página por primera vez el usuario no ha seleccionada nada, por lo que el valor de `@rating_to_show` sería `nil`. Y al usar este código `params[:ratings] || @all_ratings` si no se ha recibido ningun parametro `ratings` tomará por defecto como seleccionados todos `@all_ratings` ese sería su valor por defecto.
