@@ -134,3 +134,4 @@ production:
 
 Y además no hemos agregado PostgresSQL en nuestra app de Heroku, por lo que usamos el siguiente comando, primero verificamos la no existencia de este con `heroku addons` y debe retornar algo como `No add-ons for app su23-chips53-4.`. Luego `heroku addons:create heroku-postgresql` para crear una base de datos postgresql en Heroku para en esta realizar las migraciones e insertar las semillas.
 
+Para acceder a la aplicación https://su23-chips53-4-c3a1ca3c6fe7.herokuapp.com/
