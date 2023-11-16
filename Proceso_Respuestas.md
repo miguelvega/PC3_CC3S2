@@ -102,3 +102,20 @@ Y le asignamos las ramas con la cual van a trabajar
 </p>
 
 ## Despliegue en Heroku
+
+Primero nos logeamos con Heroku `heroku login -i` accedemos con nuestras credenciales.
+
+*No usaremos render*, por lo que usamos lo siguientes comandos `heroku apps:favorites:add -a su23-chips53-4`, para añadir a favoritos la aplicación en Heroku y `heroku git:remote -a su23-chips53-4` para agregarle un control remoto de Heroku a mi repositorio de Git. Antes de realizar esto se debe de crear la app de nombre `su23-chips53-4` con el comando `heroku create su23-chips53-4`. 
+
+Ejecutamos `git remote -v` para verificar que todo haya salido como esperabamos.
+
+```bash
+$ git remote -v
+heroku  https://git.heroku.com/su23-chips53-4.git (fetch)
+heroku  https://git.heroku.com/su23-chips53-4.git (push)
+origin  https://github.com/miguelvega/PC3_CC3S2 (fetch)
+origin  https://github.com/miguelvega/PC3_CC3S2 (push)
+```
+
+Cambiamos el stack de Heroku a 20, con el comando `heroku stack:set heroku-20`
+
