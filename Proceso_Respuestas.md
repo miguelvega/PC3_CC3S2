@@ -224,4 +224,7 @@ Con bootstrap necesitamos implementar clases en cada etiqueta de HTML. Por ejemp
 
 Tiene la clase `form-check-label` con esto se le da estilos usando Bootstrap a la etiqueta label.
 
-## Parte 2 :
+## Parte 2 : Ordenar la lista de películas
+
+
+![2023-11-17-00-06-54_mW2fjjdI](https://github.com/miguelvega/PC3_CC3S2/assets/124398378/42f2b44c-f0c2-4518-b1c7-14a1c33ec6eb)
