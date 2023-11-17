@@ -180,16 +180,48 @@ Continuando, al desplegar localmente todos los check box de los ratings estan ma
 
 ```ruby
 def self.with_ratings(ratings)
+  if ratings.present?
     where('UPPER(rating) IN (?)',ratings.map(&:upcase))
+  else 
+    all
+  end
 end
 ```
 
-Se define el método `with_ratings` con parametros `ratings` de la forma `['PG','G','PG-13','R']` en la que usamos el método `where` para realizar una consulta, y a los valores del campo `rating` los convierte en mayuscula y los valores de `ratings` tambien para que no halla error en la consulta.
+Se define el método `with_ratings` con parametros `ratings` de la forma `['PG','G','PG-13','R']` en la que usamos el método `where` para realizar una consulta, y a los valores del campo `rating` los convierte en mayuscula y los valores de `ratings` tambien para que no halla error en la consulta. Si `ratings` es nil entonces `@movies = Movie.all`.
 
 Al volver a cargar la página ya con esos cambios, nos da error ya que `ratings_to_show` no es un array, mas bien es un Hask con keys y values, de la forma {"PG"=>"1", ... } , en este caso solo importa las keys. Por lo que usando este código lo convertimos a un array de keys
 
 ```ruby
-@ratings_to_show.is_a?(Hash) ? @ratings_to_show = @ratings_to_show.keys : @ratings_to_show
+@ratings_to_show = @ratings_to_show.keys if @ratings_to_show.is_a?(Hash)
 ```
 
 Si es un Hash es decir que no es `@all_ratings` ya que este es un array, lo convierte a un array de keys. Y ya con estos cambios funciona de manera correcta el filtrado de peliculas por su rating.
+
+### Mas sugerencias
+**Labels**
+
+```ruby
+<%= label_tag "ratings[#{rating}]", rating, class: 'form-check-label' %>
+<%= check_box_tag "ratings[#{rating}]", "1", @ratings_to_show.include?(rating), class:'form-check-input' %>
+```
+
+Esto hace que el label se asocio al check_box, es decir al hacerle click al label directamente marcas o desmarcas el check_box.
+
+**Style**
+
+Para darle estilos en esta app de Rails se esta usando Bootstrap
+
+```html
+<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" integrity="sha384-JcKb8q3iqJ61gNV9KGb8thSsNjpSL0n8PARn9HuZOnIxN0hoP+VmmDGMN5t9UJ0Z" crossorigin="anonymous">
+```
+
+Con bootstrap necesitamos implementar clases en cada etiqueta de HTML. Por ejemplo :
+
+```ruby
+<%= label_tag "ratings[#{rating}]", rating, class: 'form-check-label' %>
+```
+
+Tiene la clase `form-check-label` con esto se le da estilos usando Bootstrap a la etiqueta label.
+
+## Parte 2 :

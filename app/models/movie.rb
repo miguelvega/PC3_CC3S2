@@ -4,6 +4,10 @@ class Movie < ActiveRecord::Base
   end
 
   def self.with_ratings(ratings)
-    where('UPPER(rating) IN (?)',ratings.map(&:upcase))
+    if ratings.present?
+      where('UPPER(rating) IN (?)',ratings.map(&:upcase))
+    else 
+      all
+    end
   end
 end
