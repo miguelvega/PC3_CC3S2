@@ -16,8 +16,8 @@ class MoviesController < ApplicationController
     if params[:sort].present?
       @movies = @movies.order("#{sort_column} #{sort_direction}")
       
-      @title_header_class = sort_column == 'title' ? 'hilite bg-warning' : nil
-      @release_date_header_class = sort_column == 'release_date' ? 'hilite bg-warning' : nil
+      (@title_header_class='hilite' && @btn_Movie='bg-warning') if sort_column == 'title'
+      (@release_date_header_class='hilite' && @btn_ReleaseDate='bg-warning') if sort_column == 'release_date'
     end
     
   end
