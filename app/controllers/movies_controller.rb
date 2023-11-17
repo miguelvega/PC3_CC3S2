@@ -15,9 +15,7 @@ class MoviesController < ApplicationController
     
     if params[:sort].present?
       @movies = @movies.order("#{sort_column} #{sort_direction}")
-      
-      (@title_header_class='hilite' && @btn_Movie='bg-warning') if sort_column == 'title'
-      (@release_date_header_class='hilite' && @btn_ReleaseDate='bg-warning') if sort_column == 'release_date'
+      set_style_header sort_column
     end
     
   end
@@ -55,6 +53,13 @@ class MoviesController < ApplicationController
   # This helps make clear which methods respond to requests, and which ones do not.
   def movie_params
     params.require(:movie).permit(:title, :rating, :description, :release_date)
+  end
+
+  private 
+
+  def set_style_header sort_column
+    @title_header_class='hilite bg-warning' if sort_column == 'title'
+    @release_date_header_class='hilite bg-warning' if sort_column == 'release_date'
   end
 
   def sort_column
