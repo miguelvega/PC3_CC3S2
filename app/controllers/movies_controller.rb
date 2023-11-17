@@ -13,8 +13,9 @@ class MoviesController < ApplicationController
     @ratings_to_show = @ratings_to_show.keys if @ratings_to_show.is_a?(Hash)
     @movies = Movie.with_ratings(@ratings_to_show)
     
-    # Ordenar películas según la columna seleccionada
-    @movies = @movies.order("#{sort_column} #{sort_direction}") if sort_column.present?
+    if params[:sort].present?
+      @movies = @movies.order("#{sort_column} #{sort_direction}")
+    end
   end
 
   def new
