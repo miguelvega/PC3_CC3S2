@@ -1,5 +1,6 @@
 class MoviesController < ApplicationController
 
+  helper_method :sort_column, :sort_direction
   def show
     id = params[:id] # retrieve movie ID from URI route
     @movie = Movie.find(id) # look up movie by unique ID
@@ -11,6 +12,9 @@ class MoviesController < ApplicationController
     @ratings_to_show = params[:ratings] || @all_ratings
     @ratings_to_show = @ratings_to_show.keys if @ratings_to_show.is_a?(Hash)
     @movies = Movie.with_ratings(@ratings_to_show)
+    
+    # Ordenar películas según la columna seleccionada
+    @movies = @movies.order("#{sort_column} #{sort_direction}") if sort_column.present?
   end
 
   def new
@@ -46,5 +50,13 @@ class MoviesController < ApplicationController
   # This helps make clear which methods respond to requests, and which ones do not.
   def movie_params
     params.require(:movie).permit(:title, :rating, :description, :release_date)
+  end
+
+  def sort_column
+    Movie.column_names.include?(params[:sort]) ? params[:sort] : 'title'
+  end
+
+  def sort_direction
+    %w[asc desc].include?(params[:direction]) ? params[:direction] : 'asc'
   end
 end
