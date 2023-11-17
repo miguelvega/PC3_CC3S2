@@ -175,3 +175,21 @@ Al volverlo a desplegar, encontramos otro error en la variable `@ratings_to_show
 - **Pregunta:** ¿Por qué el controlador debe configurar un valor predeterminado para @ratings_to_show incluso si no se marca nada? 
 
 Porque como se dijo anteriormete, en la vista se usa un método `include` a esa variable y al cargar la página por primera vez el usuario no ha seleccionada nada, por lo que el valor de `@rating_to_show` sería `nil`. Y al usar este código `params[:ratings] || @all_ratings` si no se ha recibido ningun parametro `ratings` tomará por defecto como seleccionados todos `@all_ratings` ese sería su valor por defecto.
+
+Continuando, al desplegar localmente todos los check box de los ratings estan marcados, pero si desmarcamos alguno de ellos al volver a cargar la página, se mostraran todas las peliculas como antes, ya que en el controlador la variable `@movies = Movie.all`. Podriamos definir un método de clase en el modelo `Movie`.
+
+```ruby
+def self.with_ratings(ratings)
+    where('UPPER(rating) IN (?)',ratings.map(&:upcase))
+end
+```
+
+Se define el método `with_ratings` con parametros `ratings` de la forma `['PG','G','PG-13','R']` en la que usamos el método `where` para realizar una consulta, y a los valores del campo `rating` los convierte en mayuscula y los valores de `ratings` tambien para que no halla error en la consulta.
+
+Al volver a cargar la página ya con esos cambios, nos da error ya que `ratings_to_show` no es un array, mas bien es un Hask con keys y values, de la forma {"PG"=>"1", ... } , en este caso solo importa las keys. Por lo que usando este código lo convertimos a un array de keys
+
+```ruby
+@ratings_to_show.is_a?(Hash) ? @ratings_to_show = @ratings_to_show.keys : @ratings_to_show
+```
+
+Si es un Hash es decir que no es `@all_ratings` ya que este es un array, lo convierte a un array de keys. Y ya con estos cambios funciona de manera correcta el filtrado de peliculas por su rating.

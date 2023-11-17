@@ -9,7 +9,8 @@ class MoviesController < ApplicationController
   def index
     @all_ratings = Movie.all_ratings
     @ratings_to_show = params[:ratings] || @all_ratings
-    @movies = Movie.all
+    @ratings_to_show.is_a?(Hash) ? @ratings_to_show = @ratings_to_show.keys : @ratings_to_show
+    @movies = Movie.with_ratings(@ratings_to_show)
   end
 
   def new
