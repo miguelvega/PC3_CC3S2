@@ -226,6 +226,46 @@ Tiene la clase `form-check-label` con esto se le da estilos usando Bootstrap a l
 
 ## Parte 2 : Ordenar la lista de películas
 
+Primero en la vista debemos de cambiar dos columnas `title,release_date` para que estos sean botones. 
+
+```ruby
+<tr>
+  <th class="<%=@title_header_class%>" ><%= link_to "Movie Title", movies_path(sort: 'title', direction: sort_direction), id: 'title_header' %></th>
+  <th>Rating</th>
+  <th class="<%=@release_date_header_class%>" ><%= link_to "Release Date", movies_path(sort: 'release_date', direction: sort_direction), id: 'release_date_header' %></th>
+  <th>More Info</th>
+</tr>
+```
+Le agregamos una variable para los estilos en cada header, cada uno de estos es un enlace envia parametros a movies_path : `sort:, direction:` y además cuenta cada uno con un ID.
+
+Ahora la lógica de esta función se debe ubicar en el controlador `movies_controller.rb` en el método index
+
+```ruby
+if params[:sort].present?
+  @movies = @movies.order("#{sort_column} #{sort_direction}")
+  set_style_header sort_column
+end
+```
+params[:sort] es un hash con estos valores `{"direction"=>"asc", "sort"=>"release_date"}` en este caso ya que se le hizo click en el header `release_date`, pero `asc` no cambia debido mas que todo al codigo :
+
+```ruby
+%w[asc desc].include?(params[:direction]) ? params[:direction] : 'asc'
+```
+
+Ya que este boton siempre debe de ordenar por los titulos o fecha de lanzamiento pero siempre de manera ascendente, por lo que su valor predeterminado en **'asc'**.
+
+```ruby
+Movie.column_names.include?(params[:sort]) ? params[:sort] : 'title'
+```
+A diferencia de el parametro :sort que tiene que cambiar entre 'title' y 'release_date'.
+
+```ruby
+def set_style_header sort_column
+  @title_header_class='hilite bg-warning' if sort_column == 'title'
+  @release_date_header_class='hilite bg-warning' if sort_column == 'release_date'
+end
+```
+Definimos un metodo privado para cambiar los estilos a cada header, dependiendo el valor de sort_column. Este código es una base para posteriormente poder no solo ordenarlo ascendentemente sino tambien de manera descendente, etc.
 
 ![2023-11-17-00-06-54_mW2fjjdI](https://github.com/miguelvega/PC3_CC3S2/assets/124398378/42f2b44c-f0c2-4518-b1c7-14a1c33ec6eb)
 
