@@ -358,3 +358,37 @@ Guardamos en variables los valores de columnas y dirección, pensando mas que to
 En la vista mantenemos las mismas keys en el hash que es parametro de `movies_path` y en la key `direction` usamos el método toggle_direction con la columna específica.
 
 ### Recordar la clasificación de los ratings
+
+Al ejecutar la aplicación en un entorno local, vemos un fallo el cual es que al hacer un refresh a la pagina con no todos los ratings de clasificaión y luego ordenarlos, este toma todos los rating a pesar de hacer escogido solo algunos. Es decir, se "olvida" de ellos.
+
+```ruby
+<tr>
+  <th class="<%=@title_header_class%>" ><%= link_to "Movie Title", movies_path(sort: 'title', direction: toggle_direction('title'), ratings: hash_ratings(@ratings_to_show)), id: 'title_header' %></th>
+  <th>Rating</th>
+  <th class="<%=@release_date_header_class%>" ><%= link_to "Release Date", movies_path(sort: 'release_date', direction: toggle_direction('release_date'), ratings: hash_ratings(@ratings_to_show)), id: 'release_date_header' %></th>
+  <th>More Info</th>
+</tr>
+```
+Para ello en la vista agregaremos un llave más al hash que funciona como parametro a la ruta, y este será `ratings` ya que es el mismo nombre que tiene la llave que contiene los ratings, valga la redundancia en el formulario de clasificación. Este será un hash, por lo que en el contrador se define un método `helper_method` para poder usarlo en la vista, para convertir un array a hash.
+
+El metodo index se mantiene sin cambios, solo necesitamos que ese valor de los ratings se mantenga al momento de ordenar y eso se guarda en `params`.
+
+Sin embargo solo se recuerda los parametros del formulario y no del ordenamiento de la tabla. 
+
+```ruby
+<%= form_tag movies_path, method: :get, id: 'ratings_form' do %>
+  <% @all_ratings.each do |rating| %>
+    <div class="form-check form-check-inline">
+      <%= label_tag "ratings[#{rating}]", rating, class: 'form-check-label' %>
+      <%= check_box_tag "ratings[#{rating}]", "1", @ratings_to_show.include?(rating), class: 'form-check-input' %>
+    </div>
+  <% end %>
+  <%= hidden_field_tag "direction", params[:direction] %>
+  <%= hidden_field_tag "sort", params[:sort] %>
+  <%= submit_tag 'Refresh', id: 'rating_submit', class: 'btn btn-primary' %>  
+<% end %>
+```
+
+Se le agregó dos campos vacios al formulario para agregar los parametros `direction` y `sort` para que al hacer refresh estos se recuerden.
+
+## Parte 3 : Recuerda la configuración de clasificación y filtrados
