@@ -226,8 +226,169 @@ Tiene la clase `form-check-label` con esto se le da estilos usando Bootstrap a l
 
 ## Parte 2 : Ordenar la lista de películas
 
+Primero en la vista debemos de cambiar dos columnas `title,release_date` para que estos sean botones. 
+
+```ruby
+<tr>
+  <th class="<%=@title_header_class%>" ><%= link_to "Movie Title", movies_path(sort: 'title', direction: sort_direction), id: 'title_header' %></th>
+  <th>Rating</th>
+  <th class="<%=@release_date_header_class%>" ><%= link_to "Release Date", movies_path(sort: 'release_date', direction: sort_direction), id: 'release_date_header' %></th>
+  <th>More Info</th>
+</tr>
+```
+Le agregamos una variable para los estilos en cada header, cada uno de estos es un enlace envia parametros a movies_path : `sort:, direction:` y además cuenta cada uno con un ID.
+
+Ahora la lógica de esta función se debe ubicar en el controlador `movies_controller.rb` en el método index
+
+```ruby
+if params[:sort].present?
+  @movies = @movies.order("#{sort_column} #{sort_direction}")
+  set_style_header sort_column
+end
+```
+params[:sort] es un hash con estos valores `{"direction"=>"asc", "sort"=>"release_date"}` en este caso ya que se le hizo click en el header `release_date`, pero `asc` no cambia debido mas que todo al codigo :
+
+```ruby
+%w[asc desc].include?(params[:direction]) ? params[:direction] : 'asc'
+```
+
+Ya que este boton siempre debe de ordenar por los titulos o fecha de lanzamiento pero siempre de manera ascendente, por lo que su valor predeterminado en **'asc'**.
+
+```ruby
+Movie.column_names.include?(params[:sort]) ? params[:sort] : 'title'
+```
+A diferencia de el parametro :sort que tiene que cambiar entre 'title' y 'release_date'.
+
+```ruby
+def set_style_header sort_column
+  @title_header_class='hilite bg-warning' if sort_column == 'title'
+  @release_date_header_class='hilite bg-warning' if sort_column == 'release_date'
+end
+```
+Definimos un metodo privado para cambiar los estilos a cada header, dependiendo el valor de sort_column. Este código es una base para posteriormente poder no solo ordenarlo ascendentemente sino tambien de manera descendente, etc.
 
 ![2023-11-17-00-06-54_mW2fjjdI](https://github.com/miguelvega/PC3_CC3S2/assets/124398378/42f2b44c-f0c2-4518-b1c7-14a1c33ec6eb)
 
 
 ### Agregar parámetros a rutas RESTful existentes 
+
+Probar las rutas en la consola de Rails, para ello usamos el comando `rails console`
+
+**Encontramos la ruta que muestra las peliculas**
+
+```ruby
+irb(main):001:0> app.movies_path
+=> "/movies"
+```
+
+**Encontramos la ruta para una pelicula con su id**
+
+```ruby
+irb(main):004:0> app.movie_path(Movie.first)
+  Movie Load (0.1ms)  SELECT  "movies".* FROM "movies"  ORDER BY "movies"."id" ASC LIMIT 1
+=> "/movies/1"
+```
+
+**Verificamos la rutas para calificacion por ratings**
+
+```ruby
+irb(main):018:0> app.movies_path("ratings"=>{"PG"=>"1"})
+=> "/movies?ratings%5BPG%5D=1"
+irb(main):019:0> app.movies_path("ratings"=>{"PG"=>"1","R"=>"1"})
+=> "/movies?ratings%5BPG%5D=1&ratings%5BR%5D=1"
+```
+Sin embargo al añadir un rating que no es válido por ejemplo `"J"=>"2"` aún existe esa ruta.
+
+```ruby
+irb(main):002:0> app.movies_path("ratings"=>{"PG"=>"1","R"=>"2"})
+=> "/movies?ratings%5BPG%5D=1&ratings%5BR%5D=2"
+irb(main):003:0> app.movies_path("ratings"=>{"PG"=>"1","J"=>"2"})
+=> "/movies?ratings%5BJ%5D=2&ratings%5BPG%5D=1"
+```
+
+**Verificamos la ruta al seleccionar el header para un orden ascendente de una columna**
+
+```ruby
+irb(main):021:0> app.movies_path(sort: 'title',direction: 'asc')
+=> "/movies?direction=asc&sort=title"
+irb(main):022:0> app.movies_path(sort: 'release',direction: 'asc')
+=> "/movies?direction=asc&sort=release"
+```
+
+Al igual que antes los parametros pueden cambiar a valores no válidos, aún sigue existiendo esa ruta.
+
+```ruby
+irb(main):004:0> app.movies_path(sort: 'titulo',direction: 'asc')
+=> "/movies?direction=asc&sort=titulo"
+```
+
+Teniendo esto en cuenta, al inicio de la parte 2 hemos implementado el ordenamiento dependiendo de la columna seleccionada pero solo de manera ascendente, ahora lo implementaremos tanto ascendentemente y descendentemente, haciendo un toggle.
+
+```ruby
+def sort_column
+  Movie.column_names.include?(params[:sort]) ? params[:sort] : ''
+end
+
+def toggle_direction(column)
+  session["sort_direction_#{column}"] = (session["sort_direction_#{column}"] == 'asc') ? 'desc' : 'asc'
+end
+```
+
+Cambiamos el método `sort_direction` por `toggle_direccion` dependiendo de la columna ya que sino sería algo similar a un rebote entre ambas columnas, es decir si en la columna `Movie Tittle` es *asc* luego en la columna `Release Date` será *des* y así sucesivamente lo cual se vería raro. 
+
+```ruby
+if params[:sort].present?
+  column_select = sort_column
+  direction_select = params[:direction]
+  @movies = @movies.order("#{column_select} #{direction_select}")
+  set_style_header column_select
+end
+```
+
+Guardamos en variables los valores de columnas y dirección, pensando mas que todo en la siguiente parte. Y lo ordenamos con estos parametros.
+
+```ruby
+<tr>
+  <th class="<%=@title_header_class%>" ><%= link_to "Movie Title", movies_path(sort: 'title', direction: toggle_direction('title')), id: 'title_header' %></th>
+  <th>Rating</th>
+  <th class="<%=@release_date_header_class%>" ><%= link_to "Release Date", movies_path(ratings: ,sort: 'release_date', direction: toggle_direction('release_date')), id: 'release_date_header' %></th>
+  <th>More Info</th>
+</tr>
+```
+En la vista mantenemos las mismas keys en el hash que es parametro de `movies_path` y en la key `direction` usamos el método toggle_direction con la columna específica.
+
+### Recordar la clasificación de los ratings
+
+Al ejecutar la aplicación en un entorno local, vemos un fallo el cual es que al hacer un refresh a la pagina con no todos los ratings de clasificaión y luego ordenarlos, este toma todos los rating a pesar de hacer escogido solo algunos. Es decir, se "olvida" de ellos.
+
+```ruby
+<tr>
+  <th class="<%=@title_header_class%>" ><%= link_to "Movie Title", movies_path(sort: 'title', direction: toggle_direction('title'), ratings: hash_ratings(@ratings_to_show)), id: 'title_header' %></th>
+  <th>Rating</th>
+  <th class="<%=@release_date_header_class%>" ><%= link_to "Release Date", movies_path(sort: 'release_date', direction: toggle_direction('release_date'), ratings: hash_ratings(@ratings_to_show)), id: 'release_date_header' %></th>
+  <th>More Info</th>
+</tr>
+```
+Para ello en la vista agregaremos un llave más al hash que funciona como parametro a la ruta, y este será `ratings` ya que es el mismo nombre que tiene la llave que contiene los ratings, valga la redundancia en el formulario de clasificación. Este será un hash, por lo que en el contrador se define un método `helper_method` para poder usarlo en la vista, para convertir un array a hash.
+
+El metodo index se mantiene sin cambios, solo necesitamos que ese valor de los ratings se mantenga al momento de ordenar y eso se guarda en `params`.
+
+Sin embargo solo se recuerda los parametros del formulario y no del ordenamiento de la tabla. 
+
+```ruby
+<%= form_tag movies_path, method: :get, id: 'ratings_form' do %>
+  <% @all_ratings.each do |rating| %>
+    <div class="form-check form-check-inline">
+      <%= label_tag "ratings[#{rating}]", rating, class: 'form-check-label' %>
+      <%= check_box_tag "ratings[#{rating}]", "1", @ratings_to_show.include?(rating), class: 'form-check-input' %>
+    </div>
+  <% end %>
+  <%= hidden_field_tag "direction", params[:direction] %>
+  <%= hidden_field_tag "sort", params[:sort] %>
+  <%= submit_tag 'Refresh', id: 'rating_submit', class: 'btn btn-primary' %>  
+<% end %>
+```
+
+Se le agregó dos campos vacios al formulario para agregar los parametros `direction` y `sort` para que al hacer refresh estos se recuerden.
+
+## Parte 3 : Recuerda la configuración de clasificación y filtrados

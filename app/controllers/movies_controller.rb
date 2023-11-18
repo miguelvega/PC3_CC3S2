@@ -1,6 +1,6 @@
 class MoviesController < ApplicationController
 
-  helper_method :sort_column, :sort_direction
+  helper_method :sort_column, :sort_direction, :toggle_direction, :hash_ratings
   def show
     id = params[:id] # retrieve movie ID from URI route
     @movie = Movie.find(id) # look up movie by unique ID
@@ -14,10 +14,12 @@ class MoviesController < ApplicationController
     @movies = Movie.with_ratings(@ratings_to_show)
     
     if params[:sort].present?
-      @movies = @movies.order("#{sort_column} #{sort_direction}")
-      set_style_header sort_column
+      column_select = sort_column
+      direction_select = params[:direction]
+      @movies = @movies.order("#{column_select} #{direction_select}")
+      set_style_header column_select
     end
-    
+
   end
 
   def new
@@ -63,10 +65,14 @@ class MoviesController < ApplicationController
   end
 
   def sort_column
-    Movie.column_names.include?(params[:sort]) ? params[:sort] : 'title'
+    Movie.column_names.include?(params[:sort]) ? params[:sort] : ''
   end
 
-  def sort_direction
-    %w[asc desc].include?(params[:direction]) ? params[:direction] : 'asc'
+  def toggle_direction(column)
+    session["sort_direction_#{column}"] = (session["sort_direction_#{column}"] == 'asc') ? 'desc' : 'asc'
+  end
+
+  def hash_ratings(ratings_keys) 
+    Hash[ratings_keys.map{|ratings_key| [ratings_key,'1']}]
   end
 end
