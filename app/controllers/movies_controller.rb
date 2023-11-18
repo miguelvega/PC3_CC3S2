@@ -70,4 +70,8 @@ class MoviesController < ApplicationController
   def toggle_direction(column)
     session["sort_direction_#{column}"] = (session["sort_direction_#{column}"] == 'asc') ? 'desc' : 'asc'
   end
+
+  def hash_rating()
+  
+  end
 end

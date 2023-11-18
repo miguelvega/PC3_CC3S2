@@ -351,7 +351,7 @@ Guardamos en variables los valores de columnas y dirección, pensando mas que to
 <tr>
   <th class="<%=@title_header_class%>" ><%= link_to "Movie Title", movies_path(sort: 'title', direction: toggle_direction('title')), id: 'title_header' %></th>
   <th>Rating</th>
-  <th class="<%=@release_date_header_class%>" ><%= link_to "Release Date", movies_path(sort: 'release_date', direction: toggle_direction('release_date')), id: 'release_date_header' %></th>
+  <th class="<%=@release_date_header_class%>" ><%= link_to "Release Date", movies_path(ratings: ,sort: 'release_date', direction: toggle_direction('release_date')), id: 'release_date_header' %></th>
   <th>More Info</th>
 </tr>
 ```
