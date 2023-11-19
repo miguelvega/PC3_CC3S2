@@ -408,3 +408,22 @@ Por tal motivo en la siguiente linea de codigo dentro del metodo index del archi
 @ratings_to_show = params[:ratings] || @all_ratings
 ``` 
 Utiliza todas las clasificaciones, ya que no recuerda ninguna.
+
+Luego, para recordar el filtro seleccionado y la lista de películas según el filtro, se está utilizando la sesión (session). En Ruby on Rails, la sesión es un mecanismo para almacenar datos del lado del servidor y asociarlos con un usuario específico. En este caso, se está utilizando la sesión para almacenar las clasificaciones seleccionadas (@ratings_to_show).
+Veamos la siguientes lineas de codigo que estan contenidas dentro del metodo index del archivo `movies_controller.rb`
+
+```ruby
+@ratings_to_show = params[:ratings] || session[:ratings] || @all_ratings
+
+```
+La linea de codigo anterior, verifica si hay clasificaciones seleccionadas en los parámetros de la solicitud actual (params[:ratings]). Si no las encuentra, busca en la sesión (session[:ratings]). Si aún no hay clasificaciones, utiliza todas las clasificaciones disponibles (@all_ratings).
+
+```ruby
+session[:ratings] = @ratings_to_show
+
+```
+Y guarda las clasificaciones seleccionadas en la sesión para recordarlas en futuras solicitudes.
+
+Cuando el usuario vuelve a la lista de películas, el controlador utiliza la información almacenada en la sesión para recordar las clasificaciones seleccionadas y mostrar la lista de películas correspondiente. Esto se logra principalmente a través de `@ratings_to_show` y `session[:ratings]`.
+
+![2023-11-19-16-30-02_fASAbY2K](https://github.com/miguelvega/PC3_CC3S2/assets/124398378/98dcc7fe-3c0e-4e5f-b1ea-32f3c4399db7)
