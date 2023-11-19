@@ -408,3 +408,50 @@ Por tal motivo en la siguiente linea de codigo dentro del metodo index del archi
 @ratings_to_show = params[:ratings] || @all_ratings
 ``` 
 Utiliza todas las clasificaciones, ya que no recuerda ninguna.
+
+Cambiamos el controlador para eso.
+
+```ruby
+def index
+  @all_ratings = Movie.all_ratings
+  @ratings_to_show = params[:ratings] || @all_ratings
+
+  if @ratings_to_show.is_a?(Hash)
+    @ratings_to_show = @ratings_to_show.keys
+  end
+
+  @movies = Movie.with_ratings(@ratings_to_show)
+  @header_select = params[:sort]
+
+  if @header_select.present?
+    column_select = sort_column(@header_select)
+    direction_select = params[:direction]
+
+    if Movie.column_names.include?(params[:sort]) && ["asc", "desc"].include?(params[:direction])
+      @movies = @movies.order("#{column_select} #{direction_select}")
+      session["sort_direction_#{params[:sort]}"] = direction_select
+      session[:sort] = column_select
+      set_style_header(column_select)
+    end
+  end
+  session[:ratings] = @ratings_to_show
+end
+```
+Creamos la instancia `@ratings_to_show` que son toma todos los ratings o los parametros ingresados por el usuario en el formulario. Ya que este es un Hash solo toma las keys. Crea una instancia en la que solo toma las peliculas con dichos ratings.
+
+Creamos una instancia para definir si hay seleccionado un header de la tabla. Verificamos que no sea nil y que sea válido, al igual que la dirección para saber si ordenarlo `asc` o `desc`, si `params[:sort]` es una columna de la tabla y si orden es válido entonces ordena la instancia `@movies` con esos parametros. Actualizamos los valores de `session` y asignamos los estilos correspondientes. 
+
+```ruby
+def save_session_params
+  if params[:sort].nil? && params[:ratings].nil?
+    params[:sort] = session[:sort]
+    params[:direction] = session["sort_direction_#{session[:sort]}"]
+    params[:ratings] = hash_ratings(session[:ratings]) if not session[:ratings].nil?
+  end
+end
+```
+
+Definimos un metodo para en caso no se ingresen parametros `:sort y :ratings` estos se "recuerden" gracias a los valores de `session`. Para que al volver a index se mantenga esta clasificación y ordenamiento. 
+
+#### Nota 
+Hay una pequeña falla, que por el momento no sabemos como solucionarlo, al momento de volver a index desde show el orden cambia es decir que si de index empieza en `asc` al ir a show y volver la dirección es `desc`.

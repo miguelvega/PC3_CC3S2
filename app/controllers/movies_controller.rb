@@ -1,6 +1,6 @@
 class MoviesController < ApplicationController
   helper_method :sort_column, :sort_direction, :toggle_direction, :hash_ratings
-
+  before_action :save_session_params, only: [:index,:show]
   def show
     id = params[:id]
     @movie = Movie.find(id)
@@ -8,23 +8,29 @@ class MoviesController < ApplicationController
 
   def index
     @all_ratings = Movie.all_ratings
-    @ratings_to_show = params[:ratings] || session[:ratings] || @all_ratings
-
+    @ratings_to_show = params[:ratings] || @all_ratings
+  
     if @ratings_to_show.is_a?(Hash)
       @ratings_to_show = @ratings_to_show.keys
     end
-
+  
     @movies = Movie.with_ratings(@ratings_to_show)
-
-    if params[:sort].present?
-      column_select = sort_column
+    @header_select = params[:sort]
+  
+    if @header_select.present?
+      column_select = sort_column(@header_select)
       direction_select = params[:direction]
-      @movies = @movies.order("#{column_select} #{direction_select}")
-      set_style_header column_select
+  
+      if Movie.column_names.include?(params[:sort]) && ["asc", "desc"].include?(params[:direction])
+        @movies = @movies.order("#{column_select} #{direction_select}")
+        session["sort_direction_#{params[:sort]}"] = direction_select
+        session[:sort] = column_select
+        set_style_header(column_select)
+      end
     end
-
     session[:ratings] = @ratings_to_show
   end
+  
 
   def new
   end
@@ -64,8 +70,8 @@ class MoviesController < ApplicationController
     @release_date_header_class = 'hilite bg-warning' if sort_column == 'release_date'
   end
 
-  def sort_column
-    Movie.column_names.include?(params[:sort]) ? params[:sort] : ''
+  def sort_column header
+    Movie.column_names.include?(header) ? header : ''
   end
 
   def toggle_direction(column)
@@ -74,6 +80,14 @@ class MoviesController < ApplicationController
 
   def hash_ratings(ratings_keys)
     Hash[ratings_keys.map { |ratings_key| [ratings_key, '1'] }]
+  end
+
+  def save_session_params
+    if params[:sort].nil? && params[:ratings].nil?
+      params[:sort] = session[:sort]
+      params[:direction] = session["sort_direction_#{session[:sort]}"]
+      params[:ratings] = hash_ratings(session[:ratings]) if not session[:ratings].nil?
+    end
   end
 end
 
