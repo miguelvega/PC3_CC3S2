@@ -1,6 +1,6 @@
 class MoviesController < ApplicationController
   helper_method :sort_column, :sort_direction, :toggle_direction, :hash_ratings
-
+  before_action :save_session_params, only: [:index]
   def show
     id = params[:id]
     @movie = Movie.find(id)
@@ -8,7 +8,7 @@ class MoviesController < ApplicationController
 
   def index
     @all_ratings = Movie.all_ratings
-    @ratings_to_show = params[:ratings] || session[:ratings] || @all_ratings
+    @ratings_to_show = params[:ratings] || @all_ratings
 
     if @ratings_to_show.is_a?(Hash)
       @ratings_to_show = @ratings_to_show.keys
@@ -19,7 +19,9 @@ class MoviesController < ApplicationController
     if params[:sort].present?
       column_select = sort_column
       direction_select = params[:direction]
-      @movies = @movies.order("#{column_select} #{direction_select}")
+      if Movie.column_names.include?(params[:sort]) && ["asc", "desc"].include?(params[:direction])
+        @movies = @movies.order("#{column_select} #{direction_select}")
+      end
       set_style_header column_select
     end
 
@@ -75,5 +77,12 @@ class MoviesController < ApplicationController
   def hash_ratings(ratings_keys)
     Hash[ratings_keys.map { |ratings_key| [ratings_key, '1'] }]
   end
+
+  def save_session_params
+    if params[:sort].nil? && params[:ratings].nil?
+      params[:ratings] = hash_ratings(session[:ratings]) if not session[:ratings].nil?
+    end
+  end
+
 end
 
