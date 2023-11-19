@@ -402,7 +402,7 @@ Cuando visitamos la página de detalles de una película (show.html.erb), el enl
 ``` 
 Este enlace apunta a movies_path, que es la ruta del índice (index) del archivo `movies_controller.rb`. Sin embargo, este enlace no incluye los parámetros actuales de clasificación y filtrado en la URL. Por lo tanto, cuando volvemos a la lista después de ver los detalles de una película, la URL no contiene la información sobre la clasificación y el filtrado que estabamos utilizando previamente
 
-Por tal motivo en la linea de codigo dentro del metodo index del archivo `movies_controller.rb` :
+Por tal motivo en la siguiente linea de codigo dentro del metodo index del archivo `movies_controller.rb` :
 
 ```ruby
 @ratings_to_show = params[:ratings] || @all_ratings
