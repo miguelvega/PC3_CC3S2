@@ -447,7 +447,7 @@ def index
     session[:ratings] = @ratings_to_show
   end
 
-```.
+```
 
 El método index también contribuye a recordar y aplicar los filtros, ya que toma toma los parámetros de clasificación y filtrado de la URL (params[:ratings] y params[:sort]), filtra y ordena las películas en consecuencia, y finalmente, guarda la configuración de clasificación en la sesión para su uso futuro.
 
