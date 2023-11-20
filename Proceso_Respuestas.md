@@ -409,28 +409,25 @@ Por tal motivo en la siguiente linea de codigo dentro del metodo index del archi
 ``` 
 Utiliza todas las clasificaciones, ya que no recuerda ninguna.
 Para recordar la configuración de clasificación y filtrado al volver a la página de lista de películas desde la página de detalles de una película, podemos hacer uso de sesiones o cookies para almacenar esa información temporalmente. 
-Veamos nuestro metodo index del archivo movies_controller.rb
 
-Por ello, para recordar el filtro seleccionado y la lista de películas según el filtro, se está utilizando la sesión (session). En Ruby on Rails, la sesión es un mecanismo para almacenar datos del lado del servidor y asociarlos con un usuario específico. En este caso, se está utilizando la sesión para almacenar las clasificaciones seleccionadas (@ratings_to_show).
-Veamos la siguientes lineas de codigo que estan contenidas dentro del metodo index del archivo `movies_controller.rb`
+Necesitamos añadir las siguiente lineas de codigo a nuestro archivo movies?controller.rb. De tal manera que se recuerden los filtros y las películas filtradas según esos filtros, para ello usaremos el método save_session_params. Este método se llama antes de la acción index mediante el `before_action :save_session_params, only: [:index]`.
 
 ```ruby
-@ratings_to_show = params[:ratings] || session[:ratings] || @all_ratings
+
+def save_session_params
+  if params[:sort].nil? && params[:ratings].nil?
+    params[:ratings] = hash_ratings(session[:ratings]) if not session[:ratings].nil?
+  end
+end
 
 ```
-La linea de codigo anterior, verifica si hay clasificaciones seleccionadas en los parámetros de la solicitud actual (params[:ratings]). Si no las encuentra, busca en la sesión (session[:ratings]). Si aún no hay clasificaciones, utiliza todas las clasificaciones disponibles (@all_ratings).
+Este método se encarga de verificar si los parámetros sort y ratings son nulos. Si ambos son nulos, significa que el usuario no ha realizado ninguna selección adicional de clasificación o filtrado en la página actual. En este caso, el método utiliza la información almacenada en la sesión (anteriormente guardada en session[:ratings]) para restaurar los filtros previos. Por lo tanto, cuando volvemos a la página de lista de películas desde la página de detalles, se restauran los filtros previos almacenados en la sesión, asegurando que se muestren las películas según la configuración anterior.
 
 ```ruby
-session[:ratings] = @ratings_to_show
 
-```
-Y guarda las clasificaciones seleccionadas en la sesión para recordarlas en futuras solicitudes.
-
-Quedando de la siguiente manera nuestro metodo index:
-```ruby
 def index
     @all_ratings = Movie.all_ratings
-    @ratings_to_show = params[:ratings] || session[:ratings] || @all_ratings
+    @ratings_to_show = params[:ratings] || @all_ratings
 
     if @ratings_to_show.is_a?(Hash)
       @ratings_to_show = @ratings_to_show.keys
@@ -441,7 +438,9 @@ def index
     if params[:sort].present?
       column_select = sort_column
       direction_select = params[:direction]
-      @movies = @movies.order("#{column_select} #{direction_select}")
+      if Movie.column_names.include?(params[:sort]) && ["asc", "desc"].include?(params[:direction])
+        @movies = @movies.order("#{column_select} #{direction_select}")
+      end
       set_style_header column_select
     end
 
@@ -450,6 +449,9 @@ def index
 
 ```
 
-Cuando el usuario vuelve a la lista de películas, el controlador utiliza la información almacenada en la sesión para recordar las clasificaciones seleccionadas y mostrar la lista de películas correspondiente. Esto se logra principalmente a través de `@ratings_to_show` y `session[:ratings]`.
+El método index también contribuye a recordar y aplicar los filtros, ya que toma toma los parámetros de clasificación y filtrado de la URL (params[:ratings] y params[:sort]), filtra y ordena las películas en consecuencia, y finalmente, guarda la configuración de clasificación en la sesión para su uso futuro.
 
 ![2023-11-19-16-30-02_fASAbY2K](https://github.com/miguelvega/PC3_CC3S2/assets/124398378/98dcc7fe-3c0e-4e5f-b1ea-32f3c4399db7)
+
+
+Como se puede apreciar, la combinación de `save_session_params` y `index` asegura que los filtros seleccionados se recuerden y se apliquen al volver a la lista de películas desde la página de detalles.
