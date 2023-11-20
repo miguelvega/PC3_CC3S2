@@ -420,7 +420,6 @@ def save_session_params
   end
 end
 
-
 ```
 Este método se encarga de verificar si los parámetros sort y ratings son nulos. Si ambos son nulos, significa que el usuario no ha realizado ninguna selección adicional de clasificación o filtrado en la página actual. En este caso, el método utiliza la información almacenada en la sesión (anteriormente guardada en session[:ratings]) para restaurar los filtros previos. Por lo tanto, cuando volvemos a la página de lista de películas desde la página de detalles, se restauran los filtros previos almacenados en la sesión, asegurando que se muestren las películas según la configuración anterior.
 
@@ -452,8 +451,7 @@ def index
 
 El método index también contribuye a recordar y aplicar los filtros, ya que toma toma los parámetros de clasificación y filtrado de la URL (params[:ratings] y params[:sort]), filtra y ordena las películas en consecuencia, y finalmente, guarda la configuración de clasificación en la sesión para su uso futuro.
 
-
-
 ![2023-11-19-16-30-02_fASAbY2K](https://github.com/miguelvega/PC3_CC3S2/assets/124398378/98dcc7fe-3c0e-4e5f-b1ea-32f3c4399db7)
+
 
 Como se puede apreciar, la combinación de `save_session_params` y `index` asegura que los filtros seleccionados se recuerden y se apliquen al volver a la lista de películas desde la página de detalles.
