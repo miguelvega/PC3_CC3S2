@@ -453,5 +453,6 @@ El método index también contribuye a recordar y aplicar los filtros, ya que to
 
 ![2023-11-19-16-30-02_fASAbY2K](https://github.com/miguelvega/PC3_CC3S2/assets/124398378/98dcc7fe-3c0e-4e5f-b1ea-32f3c4399db7)
 
+https://su23-chips53-4-migv-46e8e43db507.herokuapp.com/movies 
 
 Como se puede apreciar, la combinación de `save_session_params` y `index` asegura que los filtros seleccionados se recuerden y se apliquen al volver a la lista de películas desde la página de detalles.
