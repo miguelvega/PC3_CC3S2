@@ -409,8 +409,9 @@ Por tal motivo en la siguiente linea de codigo dentro del metodo index del archi
 ``` 
 Utiliza todas las clasificaciones, ya que no recuerda ninguna.
 Para recordar la configuración de clasificación y filtrado al volver a la página de lista de películas desde la página de detalles de una película, podemos hacer uso de sesiones o cookies para almacenar esa información temporalmente. 
+Veamos nuestro metodo index del archivo movies_controller.rb
 
-Poe ello, para recordar el filtro seleccionado y la lista de películas según el filtro, se está utilizando la sesión (session). En Ruby on Rails, la sesión es un mecanismo para almacenar datos del lado del servidor y asociarlos con un usuario específico. En este caso, se está utilizando la sesión para almacenar las clasificaciones seleccionadas (@ratings_to_show).
+Por ello, para recordar el filtro seleccionado y la lista de películas según el filtro, se está utilizando la sesión (session). En Ruby on Rails, la sesión es un mecanismo para almacenar datos del lado del servidor y asociarlos con un usuario específico. En este caso, se está utilizando la sesión para almacenar las clasificaciones seleccionadas (@ratings_to_show).
 Veamos la siguientes lineas de codigo que estan contenidas dentro del metodo index del archivo `movies_controller.rb`
 
 ```ruby
@@ -424,6 +425,30 @@ session[:ratings] = @ratings_to_show
 
 ```
 Y guarda las clasificaciones seleccionadas en la sesión para recordarlas en futuras solicitudes.
+
+Quedando de la siguiente manera nuestro metodo index:
+```ruby
+def index
+    @all_ratings = Movie.all_ratings
+    @ratings_to_show = params[:ratings] || session[:ratings] || @all_ratings
+
+    if @ratings_to_show.is_a?(Hash)
+      @ratings_to_show = @ratings_to_show.keys
+    end
+
+    @movies = Movie.with_ratings(@ratings_to_show)
+
+    if params[:sort].present?
+      column_select = sort_column
+      direction_select = params[:direction]
+      @movies = @movies.order("#{column_select} #{direction_select}")
+      set_style_header column_select
+    end
+
+    session[:ratings] = @ratings_to_show
+  end
+
+```
 
 Cuando el usuario vuelve a la lista de películas, el controlador utiliza la información almacenada en la sesión para recordar las clasificaciones seleccionadas y mostrar la lista de películas correspondiente. Esto se logra principalmente a través de `@ratings_to_show` y `session[:ratings]`.
 
